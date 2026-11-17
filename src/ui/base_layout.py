@@ -153,7 +153,8 @@ def style_base_layout():
             color: white !important;
             padding: 10px 20px !important;
             border: none !important;
-            transition: transform 0.25s ease-in-out !important;
+            transition: transform 180ms ease, box-shadow 180ms ease, background-color 220ms ease, color 220ms ease, border-color 220ms ease, filter 180ms ease !important;
+            will-change: transform;
         }
 
         button p,
@@ -162,13 +163,17 @@ def style_base_layout():
             color: white !important;
         }
 
-        button[kind="secondary"]{
+        button[kind="primary"] {
+            background-color: #5865F2 !important;
+            color: white !important;
+        }
+
+        button[kind="secondary"] {
             border-radius: 1.5rem !important;
             background-color: #EB459E !important;
             color: white !important;
             padding: 10px 20px !important;
             border: none !important;
-            transition: transform 0.25s ease-in-out !important;
         }
 
         button[kind="secondary"] p,
@@ -177,13 +182,12 @@ def style_base_layout():
             color: white !important;
         }
 
-        button[kind="tertiary"]{
+        button[kind="tertiary"] {
             border-radius: 1.5rem !important;
-            background-color: black !important;
+            background-color: #111827 !important;
             color: white !important;
             padding: 10px 20px !important;
             border: none !important;
-            transition: transform 0.25s ease-in-out !important;
         }
 
         button[kind="tertiary"] p,
@@ -192,8 +196,112 @@ def style_base_layout():
             color: white !important;
         }
 
-        button:hover{
-            transform :scale(1.05);
+        button:not(:disabled):hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(30, 41, 59, 0.18);
+            filter: brightness(1.04);
+        }
+
+        button:not(:disabled):active {
+            transform: translateY(0) scale(0.98);
+            box-shadow: 0 2px 6px rgba(30, 41, 59, 0.16);
+        }
+
+        button:focus-visible {
+            outline: 3px solid rgba(88, 101, 242, 0.55) !important;
+            outline-offset: 3px;
+        }
+
+        button:disabled {
+            cursor: not-allowed;
+            opacity: 0.58;
+            will-change: auto;
+        }
+
+        @keyframes snapclass-content-enter {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes snapclass-dialog-fade {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes snapclass-dialog-content-enter {
+            from {
+                transform: translateY(8px) scale(0.985);
+            }
+            to {
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        div[class*="st-key-teacher-tab-content-"] {
+            animation: snapclass-content-enter 380ms cubic-bezier(0.2, 0.75, 0.25, 1) both;
+        }
+
+        .snapclass-card {
+            border-radius: 20px;
+            animation: snapclass-content-enter 420ms cubic-bezier(0.2, 0.75, 0.25, 1) both;
+            animation-delay: var(--snapclass-card-delay, 0ms);
+            transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
+        }
+
+        .snapclass-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 14px 28px rgba(30, 41, 59, 0.12);
+            border-color: rgba(88, 101, 242, 0.45) !important;
+        }
+
+        div[role="dialog"] {
+            animation: snapclass-dialog-fade 240ms ease-out both;
+        }
+
+        div[role="dialog"] > div {
+            animation: snapclass-dialog-content-enter 240ms cubic-bezier(0.2, 0.75, 0.25, 1) both;
+            transform-origin: center;
+        }
+
+        div[data-testid="stSpinner"] {
+            animation: snapclass-content-enter 180ms ease-out both;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                scroll-behavior: auto !important;
+                transition-duration: 0.01ms !important;
+            }
+
+            button,
+            .snapclass-card {
+                transition-duration: 0.01ms !important;
+            }
+
+            .snapclass-card {
+                animation-delay: 0ms !important;
+            }
+
+            div[class*="st-key-teacher-tab-content-"],
+            div[role="dialog"],
+            div[role="dialog"] > div,
+            div[data-testid="stSpinner"] {
+                animation-duration: 0.01ms !important;
+            }
         }
         </style>  
         """,

@@ -1,5 +1,6 @@
 from src.database.config import supabase
 import bcrypt
+import streamlit as st
 
 
 
@@ -46,8 +47,10 @@ def create_student(new_name, face_embedding=None, voice_embedding=None):
 def create_subject(subject_code, name, section, teacher_id):
     data = {"subject_code": subject_code, "name": name, "section": section, "teacher_id": teacher_id}
     response = supabase.table("subjects").insert(data).execute()
+    get_teacher_subjects.clear()
     return response.data
 
+@st.cache_data(ttl=30)
 def get_teacher_subjects(teacher_id):
     response = supabase.table('subjects').select("*, subject_students(count), attendance_logs(timestamp)").eq("teacher_id", teacher_id).execute()
     subjects = response.data
@@ -69,20 +72,24 @@ def get_teacher_subjects(teacher_id):
 def  enroll_student_to_subject(student_id, subject_id):
     data = {'student_id': student_id, "subject_id": subject_id}
     response= supabase.table('subject_students').insert(data).execute()
+    get_teacher_subjects.clear()
+    get_student_subjects.clear()
     return response.data
-
 
 def  unenroll_student_to_subject(student_id, subject_id):
     response= supabase.table('subject_students').delete().eq('student_id', student_id).eq('subject_id', subject_id).execute()
+    get_teacher_subjects.clear()
+    get_student_subjects.clear()
     return response.data
 
 
-
+@st.cache_data(ttl=30)
 def get_student_subjects(student_id):
     response = supabase.table('subject_students').select('*, subjects(*)').eq('student_id', student_id).execute()
     return response.data
 
 
+@st.cache_data(ttl=30)
 def get_student_attendance(student_id):
     response = supabase.table('attendance_logs').select('*, subjects(*)').eq('student_id', student_id).execute()
     return response.data
@@ -90,9 +97,17 @@ def get_student_attendance(student_id):
 
 def create_attendance(logs):
     response = supabase.table('attendance_logs').insert(logs).execute()
+    get_teacher_subjects.clear()
+    get_student_attendance.clear()
+    get_attendance_for_teacher.clear()
     return response.data
 
-def get_attendance_for_teacher(teacher_id):
-    response = supabase.table('attendance_logs').select("*, subjects!inner(*), students(student_id, name)").eq('subjects.teacher_id', teacher_id).order('timestamp', desc=True).execute()
+@st.cache_data(ttl=30)
+def get_attendance_for_teacher(teacher_id, date=None):
+    query = supabase.table('attendance_logs').select("*, subjects!inner(*), students(student_id, name)").eq('subjects.teacher_id', teacher_id)
+    if date:
+        date_str = str(date)[:10]
+        query = query.gte('timestamp', f"{date_str} 00:00:00").lte('timestamp', f"{date_str}T23:59:59.999999")
+    response = query.order('timestamp', desc=True).execute()
     return response.data
 

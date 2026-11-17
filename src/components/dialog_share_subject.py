@@ -3,11 +3,12 @@ import streamlit as st
 import segno
 import io
 
+from src.config import build_class_join_url
+
 
 @st.dialog("Share Class Link")
 def share_subject_dialog(subject_name, subject_code):
-    app_domain = "snapclass-main.streamlit.app"
-    join_url = f"{app_domain}/?join-code={subject_code}"
+    join_url = build_class_join_url(subject_code)
 
     st.header("Scan to Join")
 
@@ -15,7 +16,7 @@ def share_subject_dialog(subject_name, subject_code):
 
     out = io.BytesIO()
 
-    qr.save(out, kind='png', scale=10, border=1)
+    qr.save(out, kind='png', scale=10, border=4)
 
     col1, col2 = st.columns(2)
 
